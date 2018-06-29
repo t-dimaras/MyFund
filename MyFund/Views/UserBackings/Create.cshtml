@@ -1,0 +1,36 @@
+﻿@model MyFund.Model.Project
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>UserBacking</h4>
+<hr />
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            @for (var i = 0; i < Model.BackingPackages.Count; i++)
+            {
+                var backingProject = Model.BackingPackages.ToList()[i];
+                await Html.PartialAsync("/Views/BackingPackages/_DetailsPartial.cshtml", backingProject);
+                Html.RadioButtonFor(bp => Model.BackingPackages, backingProject);
+                
+            }
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Projects" asp-action="Details" asp-route-id="@Model.Id">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

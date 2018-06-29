@@ -9,9 +9,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyFund.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MyFund.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using MyFund.Services;
 
 namespace MyFund
 {
@@ -34,13 +37,29 @@ namespace MyFund
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<CrowdContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddIdentity<User, IdentityRole<long>>()
+                .AddDefaultUI()
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<CrowdContext>();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ProjectCreator", policy =>
+                    policy.Requirements.Add(new ResourceOwnerRequirement()));
+            });
+            services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
+
+            services.AddMvc(config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                                 .RequireAuthenticatedUser()
+                                 .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1); ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

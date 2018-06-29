@@ -1,0 +1,49 @@
+﻿@model MyFund.Model.Project
+
+<h4>Pledge tiers</h4>
+@{
+    var authorizationResult = (await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator"));
+    if (authorizationResult.Succeeded)
+    {
+        <p>
+            <a asp-controller="BackingPackages" asp-action="Create" asp-route-id="@Model.Id">Create New</a>
+        </p>
+    }
+    else if (User.Identity.IsAuthenticated && Model.StatusId == 2 && Model.BackingPackages.Count > 0)
+    {
+            <form asp-Controller="UserBackings" asp-action="Create" asp-route-id="@Model.Id">
+                <button id="btn-user-back-project" type="submit">Back this project</button>
+            </form>
+    }
+    else
+    {
+        <p></p>
+    }
+}
+<table class="table">
+    <tbody>
+        @foreach (var item in Model.BackingPackages)
+        {
+            <tr>
+                <td class="td-backing-item-view">
+                    <div>
+                        @await Html.PartialAsync("_DetailsPartial.cshtml", item)
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-backing-item-nav">
+                    @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
+                    {
+                        <a asp-controller="BackingPackages" asp-action="Edit" asp-route-id="@item.Id">Edit</a><span> | </span>
+                    }
+                    <a asp-controller="BackingPackages" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
+                    {
+                        <span> | </span><a asp-controller="BackingPackages" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
