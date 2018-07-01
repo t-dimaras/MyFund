@@ -11,7 +11,7 @@
             <li class="dropdown">
                 <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage" class="dropdown-toggle" data-toggle="dropdown">Hello @UserManager.GetUserName(User)!<span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a href="#">My projects</a></li>
+                    <li><a asp-controller="Projects" asp-action="Dashboard">My projects</a></li>
                     <li><span class="divider"></span></li>
                     <li><a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Account</a></li>
                 </ul>

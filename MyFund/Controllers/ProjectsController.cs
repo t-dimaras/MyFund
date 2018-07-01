@@ -25,17 +25,31 @@ namespace MyFund.Controllers
             _authorizationService = authorizationService;
         }
 
-        // GET: Projects
-        [AllowAnonymous]
-        public async Task<IActionResult> Index(string sortOrder, string searchString, string includeDesChecked)
+        [Authorize]
+        public async Task<IActionResult> Dashboard(string sortOrder)
         {
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["DeadlineSortParm"] = sortOrder == "Deadline" ? "deadline_desc" : "Deadline";
             ViewData["CategorySortParm"] = sortOrder == "Category" ? "category_desc" : "Category";
-            ViewData["currentFilter"] = searchString;
-            ViewData["isIncludeDescChecked"] = includeDesChecked;
-            bool isIncludeDesChecked = includeDesChecked == "on";
+            ViewData["StatusSortParm"] = sortOrder == "Status" ? "status_desc" : "Status";
 
+            var projectContext = _context.Project
+                                .Include(p => p.AttatchmentSet)
+                                .Include(p => p.ProjectCategory)
+                                .Include(p => p.Status)
+                                .Include(p => p.User)
+                                .Where(p => p.UserId == User.GetUserId());
+            await projectContext.LoadAsync();
+
+            projectContext = ApplySortOrder(projectContext, sortOrder);
+
+            return View(projectContext);
+        }
+
+        // GET: Projects
+        [AllowAnonymous]
+        public async Task<IActionResult> Index(string sortOrder, string searchString, string includeDesChecked)
+        {
             var projectContext = _context.Project
                                 .Include(p => p.AttatchmentSet)
                                 .Include(p => p.ProjectCategory)
@@ -44,41 +58,76 @@ namespace MyFund.Controllers
                                 .Where(p => p.StatusId == (long)Status.StatusDescription.Active);
             await projectContext.LoadAsync();
 
+            #region search
+            ViewData["currentFilter"] = searchString;
+            ViewData["isIncludeDescChecked"] = includeDesChecked;
+            bool isIncludeDesChecked = includeDesChecked == "on";
+
+            projectContext = FilterProjects(projectContext, searchString, isIncludeDesChecked);
+            #endregion
+
+            #region sort
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DeadlineSortParm"] = sortOrder == "Deadline" ? "deadline_desc" : "Deadline";
+            ViewData["CategorySortParm"] = sortOrder == "Category" ? "category_desc" : "Category";
+
+            projectContext = ApplySortOrder(projectContext, sortOrder);
+            #endregion
+
+            return View(projectContext);
+        }
+
+        private static IQueryable<Project> FilterProjects(IQueryable<Project> projectContext, string searchString, bool filterShortDescription)
+        {
+            var filteredContext = projectContext;
             if (!String.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.Trim();
-                if (!isIncludeDesChecked)
+                if (!filterShortDescription)
                 {
-                    projectContext = projectContext.Where(p => p.Name.Contains(searchString)
+                    filteredContext = projectContext.Where(p => p.Name.Contains(searchString)
                                                              || p.Title.Contains(searchString));
                 }
                 else
                 {
-                    projectContext = projectContext.Where(p => p.Name.Contains(searchString)
+                    filteredContext = projectContext.Where(p => p.Name.Contains(searchString)
                                                              || p.Title.Contains(searchString)
                                                              || p.ShortDescription.Contains(searchString));
                 }
             }
+            return filteredContext;
+        }
+
+        private static IQueryable<Project> ApplySortOrder(IQueryable<Project> projectContext, string sortOrder)
+        {
+            var sortedContext = projectContext;
 
             switch (sortOrder)
             {
                 case "name_desc":
-                    projectContext.OrderByDescending(p => p.Name);
+                    sortedContext = sortedContext.OrderByDescending(p => p.Name);
                     break;
                 case "Deadline":
-                    projectContext.OrderBy(p => p.Deadline);
+                    sortedContext = sortedContext.OrderBy(p => p.Deadline);
                     break;
                 case "deadline_desc":
-                    projectContext.OrderByDescending(p => p.Deadline);
+                    sortedContext = sortedContext.OrderByDescending(p => p.Deadline);
                     break;
                 case "Category":
-                    projectContext.OrderBy(p => p.ProjectCategory.Name);
+                    sortedContext = sortedContext.OrderBy(p => p.ProjectCategory.Name);
                     break;
                 case "category_desc":
-                    projectContext.OrderByDescending(p => p.ProjectCategory.Name);
+                    sortedContext = sortedContext.OrderByDescending(p => p.ProjectCategory.Name);
+                    break;
+                case "Status":
+                    sortedContext = sortedContext.OrderBy(p => p.Status.Name);
+                    break;
+                case "status_desc":
+                    sortedContext = sortedContext.OrderByDescending(p => p.Status.Name);
                     break;
             }
-            return View(projectContext);
+
+            return sortedContext;
         }
 
         // GET: Projects/Details/5
@@ -174,7 +223,9 @@ namespace MyFund.Controllers
                 return NotFound();
             }
 
-            var project = await _context.Project.FindAsync(id);
+            var project = await _context.Project
+                                    .Include(p=>p.BackingPackages)
+                                    .FirstOrDefaultAsync(p=>p.Id == id);
             if (project == null)
             {
                 return NotFound();
@@ -184,10 +235,10 @@ namespace MyFund.Controllers
 
             if (authorizationResult.Succeeded)
             {
-                ViewData["AttatchmentSetId"] = new SelectList(_context.AttatchmentSet, "Id", "Id", project.AttatchmentSetId);
-                ViewData["ProjectCategoryId"] = new SelectList(_context.ProjectCategory, "Id", "Name", project.ProjectCategoryId);
-                ViewData["StatusId"] = new SelectList(_context.Status, "Id", "Name", project.StatusId);
-                ViewData["UserId"] = new SelectList(_context.User, "Id", "Email", project.UserId);
+                ViewData["AttatchmentSetId"] = project.AttatchmentSetId;
+                ViewData["ProjectCategoryId"] = new SelectList(_context.ProjectCategory, "Id", "Name");
+                ViewData["StatusId"] = project.StatusId;
+                ViewData["UserId"] = project.UserId;
                 return View(project);
             }
             else if (User.Identity.IsAuthenticated)
@@ -205,7 +256,6 @@ namespace MyFund.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Policy = "ProjectCreator")]
         public async Task<IActionResult> Edit(long id, [Bind("Id,Name,Title,ShortDescription,Description,Goal,AmountGathered,DateCreated,DateUpdated,Deadline,StatusId,ProjectCategoryId,Url,UserId,AttatchmentSetId,MediaUrl")] Project project)
         {
             if (id != project.Id)
@@ -215,23 +265,39 @@ namespace MyFund.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var authorizationResult = await _authorizationService.AuthorizeAsync(User, project, "ProjectCreator");
+
+                if (authorizationResult.Succeeded)
                 {
-                    _context.Update(project);
-                    await _context.SaveChangesAsync();
+                    #region try commit
+                    try
+                    {
+                        project.DateUpdated = DateTime.Now;
+                        _context.Update(project);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!ProjectExists(project.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction(nameof(Dashboard));
+                    #endregion
                 }
-                catch (DbUpdateConcurrencyException)
+                else if (User.Identity.IsAuthenticated)
                 {
-                    if (!ProjectExists(project.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return new ForbidResult();
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                {
+                    return new ChallengeResult();
+                }
             }
             ViewData["AttatchmentSetId"] = new SelectList(_context.AttatchmentSet, "Id", "Id", project.AttatchmentSetId);
             ViewData["ProjectCategoryId"] = new SelectList(_context.ProjectCategory, "Id", "Name", project.ProjectCategoryId);

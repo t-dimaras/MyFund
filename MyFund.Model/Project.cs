@@ -50,7 +50,10 @@ namespace MyFund.Model
 
         [DisplayName("Category")]
         public ProjectCategory ProjectCategory { get; set; }
+
+        [DisplayName("Status")]
         public Status Status { get; set; }
+
         public User User { get; set; }
         public ICollection<BackingPackage> BackingPackages { get; set; }
         public ICollection<ProjectUpdate> ProjectUpdates { get; set; }
