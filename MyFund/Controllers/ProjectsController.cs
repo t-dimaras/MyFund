@@ -29,7 +29,12 @@ namespace MyFund.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var crowdContext = _context.Project.Include(p => p.AttatchmentSet).Include(p => p.ProjectCategory).Include(p => p.Status).Include(p => p.User);
+            var crowdContext = _context.Project
+                                .Include(p => p.AttatchmentSet)
+                                .Include(p => p.ProjectCategory)
+                                .Include(p => p.Status)
+                                .Include(p => p.User)
+                                .Where(p => p.StatusId == (long)Status.StatusDescription.Active);
             return View(await crowdContext.ToListAsync());
         }
 
@@ -49,6 +54,7 @@ namespace MyFund.Controllers
                 .Include(p => p.User)
                 .Include(p => p.BackingPackages)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (project == null)
             {
                 return NotFound();

@@ -1,6 +1,6 @@
 ﻿@model MyFund.Model.BackingPackage
 
-<div>
+<div class="@(Model.UserBackings.Any() ? "text-primary bg-primary" : "")">
     <h4>@Html.DisplayFor(model => model.Name)</h4>
     <hr />
     <dl class="dl-horizontal">
@@ -55,9 +55,8 @@
     </dl>
 </div>
 <div>
-    @if ((await AuthorizationService.AuthorizeAsync(User, Model.Project, "ProjectCreator")).Succeeded)
+    @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
     {
-        <a asp-controller="BackingPackages" asp-action="Edit" asp-route-id="@Model.Id">Edit</a><span> | </span>
+        <a asp-controller="BackingPackages" asp-action="Edit" asp-route-id="@Model.Id" class="btn-default">Edit</a><span> | </span>
     }
-    <a asp-action="Index">Back to List</a>
 </div>

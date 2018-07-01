@@ -1,4 +1,4 @@
-﻿@model MyFund.Model.Project
+﻿@model MyFund.Model.UserBacking
 
 @{
     ViewData["Title"] = "Create";
@@ -12,13 +12,17 @@
     <div class="col-md-5">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
-            @for (var i = 0; i < Model.BackingPackages.Count; i++)
+            <span asp-validation-for="BackingId" class="text-danger"></span>
+            @for (var i = 0; i < Model.Backing.Project.BackingPackages.Count; i++)
             {
-                var backingProject = Model.BackingPackages.ToList()[i];
-                await Html.PartialAsync("/Views/BackingPackages/_DetailsPartial.cshtml", backingProject);
-                Html.RadioButtonFor(bp => Model.BackingPackages, backingProject);
-                
+                <div class="form-group">
+                    @{
+                        var backingProject = Model.Backing.Project.BackingPackages.ToList()[i];
+                        await Html.RenderPartialAsync("/Views/BackingPackages/_DetailsPartial.cshtml", backingProject);
+                        Html.RadioButtonFor(bp => bp.Backing.Project.BackingPackages, backingProject.Id);
+                    }
+                    <input type="radio" asp-for="BackingId" value="@backingProject.Id" class="form-control" />
+                </div>
             }
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
@@ -28,7 +32,7 @@
 </div>
 
 <div>
-    <a asp-controller="Projects" asp-action="Details" asp-route-id="@Model.Id">Back to List</a>
+    <a asp-controller="Projects" asp-action="Details" asp-route-id="@Model.Backing.Project.Id">Back to List</a>
 </div>
 
 @section Scripts {

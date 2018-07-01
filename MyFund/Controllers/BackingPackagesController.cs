@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MyFund.Extensions;
 using MyFund.Model;
@@ -50,7 +51,7 @@ namespace MyFund.Controllers
                     }
                 }
 
-                return View(projectContext.BackingPackages);
+                return View(projectContext.BackingPackages.OrderBy(bp => bp.BackingAmount));
             }
 
             return NotFound();
@@ -69,9 +70,16 @@ namespace MyFund.Controllers
                 .Include(b => b.AttatchmentSet)
                 .Include(b => b.Project)
                 .FirstOrDefaultAsync(m => m.Id == id);
+       
             if (backingPackage == null)
             {
                 return NotFound();
+            }
+
+            if (User.Identity.IsAuthenticated && backingPackage.Project.UserId != User.GetUserId())
+            {
+                var userBacking = await _context.UserBacking.SingleOrDefaultAsync(ub => ub.BackingId == backingPackage.Id && ub.UserId == User.GetUserId());
+                backingPackage.UserBackings.Add(userBacking);
             }
 
             return View(backingPackage);

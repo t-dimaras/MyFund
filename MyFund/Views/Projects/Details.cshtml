@@ -104,6 +104,15 @@
         </dl>
     </div>
     <div id="project-backing" class="col-md-5">
+        @{
+            if (User.Identity.IsAuthenticated && Model.StatusId == 2 && Model.BackingPackages.Count > 0)
+            {
+                <div id="backings-nav">
+                    <a asp-Controller="UserBackings" asp-action="Create" asp-route-projectId="@Model.Id" id="btn-user-back-project">Back this project</a>
+                </div>
+            }
+        }
+        </>
         @await Html.PartialAsync("/Views/BackingPackages/_IndexPartial.cshtml", Model)
     </div>
 </div>

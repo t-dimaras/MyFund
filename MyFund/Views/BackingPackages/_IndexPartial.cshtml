@@ -9,12 +9,6 @@
             <a asp-controller="BackingPackages" asp-action="Create" asp-route-id="@Model.Id">Create New</a>
         </p>
     }
-    else if (User.Identity.IsAuthenticated && Model.StatusId == 2 && Model.BackingPackages.Count > 0)
-    {
-            <form asp-Controller="UserBackings" asp-action="Create" asp-route-id="@Model.Id">
-                <button id="btn-user-back-project" type="submit">Back this project</button>
-            </form>
-    }
     else
     {
         <p></p>
