@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyFund.Model;
 using MyFund.Models;
 
 namespace MyFund.Controllers
@@ -12,9 +14,22 @@ namespace MyFund.Controllers
     [AllowAnonymous]
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly CrowdContext _context;
+
+        public HomeController(CrowdContext context)
         {
-            return View();
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var topProjects = await _context.Project
+                                .Include(p => p.ProjectCategory)
+                                .OrderBy(p => p.AmountGathered)
+                                .Take(3)
+                                .ToListAsync();
+
+            return View(topProjects);
         }
 
         public IActionResult About()
