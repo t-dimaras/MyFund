@@ -27,15 +27,58 @@ namespace MyFund.Controllers
 
         // GET: Projects
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string searchString, string includeDesChecked)
         {
-            var crowdContext = _context.Project
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DeadlineSortParm"] = sortOrder == "Deadline" ? "deadline_desc" : "Deadline";
+            ViewData["CategorySortParm"] = sortOrder == "Category" ? "category_desc" : "Category";
+            ViewData["currentFilter"] = searchString;
+            ViewData["isIncludeDescChecked"] = includeDesChecked;
+            bool isIncludeDesChecked = includeDesChecked == "on";
+
+            var projectContext = _context.Project
                                 .Include(p => p.AttatchmentSet)
                                 .Include(p => p.ProjectCategory)
                                 .Include(p => p.Status)
                                 .Include(p => p.User)
                                 .Where(p => p.StatusId == (long)Status.StatusDescription.Active);
-            return View(await crowdContext.ToListAsync());
+            await projectContext.LoadAsync();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.Trim();
+                if (!isIncludeDesChecked)
+                {
+                    projectContext = projectContext.Where(p => p.Name.Contains(searchString)
+                                                             || p.Title.Contains(searchString));
+                }
+                else
+                {
+                    projectContext = projectContext.Where(p => p.Name.Contains(searchString)
+                                                             || p.Title.Contains(searchString)
+                                                             || p.ShortDescription.Contains(searchString));
+                }
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    projectContext.OrderByDescending(p => p.Name);
+                    break;
+                case "Deadline":
+                    projectContext.OrderBy(p => p.Deadline);
+                    break;
+                case "deadline_desc":
+                    projectContext.OrderByDescending(p => p.Deadline);
+                    break;
+                case "Category":
+                    projectContext.OrderBy(p => p.ProjectCategory.Name);
+                    break;
+                case "category_desc":
+                    projectContext.OrderByDescending(p => p.ProjectCategory.Name);
+                    break;
+            }
+            return View(projectContext);
         }
 
         // GET: Projects/Details/5
