@@ -3,77 +3,92 @@
 @{
     ViewData["Title"] = "Index";
 }
-
-<h2>Index</h2>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<form asp-action="Index" method="get">
-    <div class="form-actions no-color">
-        <p>
-            Search: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
-            <input type="submit" value="Search" class="btn btn-default" /> | 
-            Include short description: <input type="checkbox" class="checkbox checkbox-inline" name="IncludeDesChecked" id="check-include-desc" value="@ViewData["includeDesChecked"]" /> | 
-            <a asp-action="Index">Back to Full List</a>
-        </p>
+<div class="row">
+    <div class="col-sm-2">
+        <h4>Categories</h4>
+        <ul class="nav nav-pills nav-stacked" id="nav-categories">
+            @{
+                var categories = Model.Select(p => p.ProjectCategory).Distinct().OrderBy(cat => cat.Name);
+                foreach (var category in categories)
+                {
+                    var isSelectedCategory = long.TryParse(ViewData["categoryId"].ToString(), out long selectedCategoryId);
+                    <li class="@((isSelectedCategory && category.Id == selectedCategoryId) ? "active": "" )">
+                        <a asp-action="Index" asp-route-categoryId="@category.Id">@category.Name</a>
+                    </li>
+                }
+            }
+        </ul>
     </div>
-</form>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">@Html.DisplayNameFor(model => model.Name)</a>
-            </th>
-            <th class="col-md-3">
-                @Html.DisplayNameFor(model => model.ShortDescription)
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["CategorySortParm"]">@Html.DisplayNameFor(model => model.ProjectCategory)</a>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Goal)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AmountGathered)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateCreated)
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["CategorySortParm"]">@Html.DisplayNameFor(model => model.Deadline)</a>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
-                </td>
-                <td  class="col-md-3">
-                    @Html.DisplayFor(modelItem => item.ShortDescription)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ProjectCategory.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Goal)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AmountGathered)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateCreated)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Deadline)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="col-sm-10">
+        <h2>Index</h2>
+         <form asp-action="Index" method="get">
+            <div class="form-actions no-color">
+                <p>
+                    Search: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+                    <input type="submit" value="Search" class="btn btn-default" asp-route-categoryId="@ViewData["categoryId"]" /> |
+                    Include short description: <input type="checkbox" class="checkbox checkbox-inline" name="IncludeDesChecked" id="check-include-desc" value="@ViewData["includeDesChecked"]" /> |
+                    <a asp-action="Index" >Back to Full List</a>
+                </p>
+            </div>
+        </form>
+        <table class="table" col="col-md-9">
+            <thead>
+                <tr>
+                    <th>
+                        <a asp-action="Index" asp-route-categoryId="@ViewData["categoryId"]" asp-route-sortOrder="@ViewData["NameSortParam"]">@Html.DisplayNameFor(model => model.Name)</a>
+                    </th>
+                    <th class="col-md-3">
+                        @Html.DisplayNameFor(model => model.ShortDescription)
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-categoryId="@ViewData["categoryId"]" asp-route-sortOrder="@ViewData["CategorySortParam"]">@Html.DisplayNameFor(model => model.ProjectCategory)</a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-categoryId="@ViewData["categoryId"]" asp-route-sortOrder="@ViewData["GoalSortParam"]">@Html.DisplayNameFor(model => model.Goal)</a>
+</th>
+                    <th>
+                        <a asp-action="Index" asp-route-categoryId="@ViewData["categoryId"]" asp-route-sortOrder="@ViewData["AmountGatheredSortParam"]">@Html.DisplayNameFor(model => model.AmountGathered)</a>
+</th>
+                    <th>
+                        <a asp-action="Index" asp-route-categoryId="@ViewData["categoryId"]" asp-route-sortOrder="@ViewData["DateCreatedSortParam"]">@Html.DisplayNameFor(model => model.DateCreated)</a>
+</th>
+                    <th>
+                        <a asp-action="Index" asp-route-categoryId="@ViewData["categoryId"]" asp-route-sortOrder="@ViewData["DeadlineSortParam"]">Days to go</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
+                        </td>
+                        <td class="col-md-3">
+                            @Html.DisplayFor(modelItem => item.ShortDescription)
+                        </td>
+                        <td>
+                            <a asp-action="Index" asp-route-categoryId="@item.ProjectCategoryId">@Html.DisplayFor(modelItem => item.ProjectCategory.Name)</a>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Goal)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AmountGathered)
+                        </td>
+                        <td>
+                            @item.DateCreated.ToShortDateString()
+                        </td>
+                        <td>
+                            @((item.Deadline - DateTime.Now).Days)
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

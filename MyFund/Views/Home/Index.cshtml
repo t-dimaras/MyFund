@@ -4,7 +4,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+@*<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
     <ol class="carousel-indicators">
         <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
         <li data-target="#myCarousel" data-slide-to="1"></li>
@@ -53,19 +53,20 @@
         <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
     </a>
-</div>
+</div>*@
 
 <div class="row">
     <div class="col-md-3">
         <h2>Trending projects</h2>
-        <ul>
+        <ul class="list-unstyled">
             @{
                 foreach (var item in Model)
                 {
-                    <li>
-                        <span>
-                            <a asp-controller="Projects" asp-action="Details" asp-route-id="@item.Id">@item.Name</a> in category @item.ProjectCategory.Name
-                        </span>
+                    <li class="well well-lg">
+                        <h3><a asp-controller="Projects" asp-action="Details" asp-route-id="@item.Id">@item.Name</a> in category <a asp-controller="Projects" asp-action="Index" asp-route-categoryId="@item.ProjectCategoryId">@item.ProjectCategory.Name</a></h3>
+                        <h4>@item.Title</h4>
+                        <p class="lead">@item.ShortDescription</p>
+                        <p class="text-info bg-info">@((item.Deadline - DateTime.Now).Days) days to go.</p>
                     </li>
                 }
             }

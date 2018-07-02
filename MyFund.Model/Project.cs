@@ -23,15 +23,20 @@ namespace MyFund.Model
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
 
+        [DataType(DataType.Currency)]
         public decimal Goal { get; set; }
 
         [DisplayName("Progress")]
+        [DataType(DataType.Currency)]
         public decimal AmountGathered { get; set; }
 
         [DisplayName("Created on")]
         public DateTime DateCreated { get; set; }
+
+        [DisplayName("Updated on")]
         public DateTime? DateUpdated { get; set; }
 
+        [DisplayName("Target date")]
         [DataType(DataType.Date)]
         public DateTime Deadline { get; set; }
 

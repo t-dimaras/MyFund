@@ -48,7 +48,7 @@ namespace MyFund.Controllers
 
         // GET: Projects
         [AllowAnonymous]
-        public async Task<IActionResult> Index(string sortOrder, string searchString, string includeDesChecked)
+        public async Task<IActionResult> Index(string sortOrder, string searchString, string includeDesChecked, long categoryId)
         {
             var projectContext = _context.Project
                                 .Include(p => p.AttatchmentSet)
@@ -59,17 +59,21 @@ namespace MyFund.Controllers
             await projectContext.LoadAsync();
 
             #region search
+            ViewData["categoryId"] = categoryId;
             ViewData["currentFilter"] = searchString;
             ViewData["isIncludeDescChecked"] = includeDesChecked;
             bool isIncludeDesChecked = includeDesChecked == "on";
 
-            projectContext = FilterProjects(projectContext, searchString, isIncludeDesChecked);
+            projectContext = FilterProjects(projectContext, searchString, isIncludeDesChecked, categoryId);
             #endregion
 
             #region sort
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DeadlineSortParm"] = sortOrder == "Deadline" ? "deadline_desc" : "Deadline";
-            ViewData["CategorySortParm"] = sortOrder == "Category" ? "category_desc" : "Category";
+            ViewData["NameSortParam"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DeadlineSortParam"] = sortOrder == "Deadline" ? "deadline_desc" : "Deadline";
+            ViewData["CategorySortParam"] = sortOrder == "Category" ? "category_desc" : "Category";
+            ViewData["AmountGatheredSortParam"] = sortOrder == "AmountGathered" ? "amountGathered_desc" : "AmountGathered";
+            ViewData["GoalSortParam"] = sortOrder == "Goal" ? "goal_desc" : "Goal";
+            ViewData["DateCreatedSortParam"] = sortOrder == "DateCreated" ? "dateCreated_desc" : "DateCreated";
 
             projectContext = ApplySortOrder(projectContext, sortOrder);
             #endregion
@@ -77,9 +81,14 @@ namespace MyFund.Controllers
             return View(projectContext);
         }
 
-        private static IQueryable<Project> FilterProjects(IQueryable<Project> projectContext, string searchString, bool filterShortDescription)
+        private static IQueryable<Project> FilterProjects
+            (IQueryable<Project> projectContext, string searchString, bool filterShortDescription, long categoryId)
         {
             var filteredContext = projectContext;
+            if (categoryId > 0)
+            {
+                filteredContext = projectContext.Where(p => p.ProjectCategoryId == categoryId);
+            }
             if (!String.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.Trim();
@@ -124,6 +133,24 @@ namespace MyFund.Controllers
                     break;
                 case "status_desc":
                     sortedContext = sortedContext.OrderByDescending(p => p.Status.Name);
+                    break;
+                case "AmountGathered":
+                    sortedContext = sortedContext.OrderByDescending(p => p.AmountGathered);
+                    break;
+                case "amountGathered_desc":
+                    sortedContext = sortedContext.OrderBy(p => p.AmountGathered);
+                    break;
+                case "Goal":
+                    sortedContext = sortedContext.OrderByDescending(p => p.Goal);
+                    break;
+                case "goal_desc":
+                    sortedContext = sortedContext.OrderBy(p => p.Goal);
+                    break;
+                case "DateCreated":
+                    sortedContext = sortedContext.OrderByDescending(p => p.DateCreated);
+                    break;
+                case "dateCreated_desc":
+                    sortedContext = sortedContext.OrderByDescending(p => p.DateCreated);
                     break;
             }
 

@@ -4,104 +4,107 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
-
-<div>
-    <h4>@Html.DisplayFor(model => model.Name)</h4>
-    <hr />
-    <div id="project-details" class="col-md-7">
-        <dl class="dl-horizontal">
-            <dt>
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Name)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Title)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Title)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.ShortDescription)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.ShortDescription)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Description)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Description)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Goal)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Goal)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.AmountGathered)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.AmountGathered)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.DateCreated)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.DateCreated)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.DateUpdated)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.DateUpdated)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Deadline)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Deadline)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Url)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Url)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.MediaUrl)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.MediaUrl)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.AttatchmentSet)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.AttatchmentSet.Id)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.ProjectCategory)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.ProjectCategory.Name)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Status)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Status.Name)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.User)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.User.Email)
-            </dd>
-        </dl>
+<div class="row">
+    <div>
+        <div id="project-details">
+            <div class="col-md-7">
+                <h2>Details</h2>
+                <h3>@Html.DisplayFor(model => model.Name)</h3>
+                <hr />
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Title)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Title)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.ShortDescription)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.ShortDescription)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Description)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Goal)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Goal)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.AmountGathered)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.AmountGathered)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.DateCreated)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.DateCreated)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.DateUpdated)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.DateUpdated)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Deadline)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Deadline)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Url)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Url)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.MediaUrl)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.MediaUrl)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.AttatchmentSet)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.AttatchmentSet.Id)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.ProjectCategory)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.ProjectCategory.Name)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Status.Name)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.User)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.User.Email)
+                    </dd>
+                </dl>
+            </divclass="col-md-7">
+        </div>
     </div>
     <div id="project-backing" class="col-md-5">
         @{
@@ -116,10 +119,10 @@
         @await Html.PartialAsync("/Views/BackingPackages/_IndexPartial.cshtml", Model)
     </div>
 </div>
-<div class="col-md-12">
+<div class="row col-md-12">
     @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
     {
         <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a><span> | </span>
     }
-        <a asp-action="Index">Back to List</a>
-    </div>
+    <a asp-action="Index">Back to List</a>
+</div>

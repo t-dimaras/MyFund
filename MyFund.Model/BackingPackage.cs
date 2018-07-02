@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyFund.Model
 {
@@ -12,11 +14,22 @@ namespace MyFund.Model
 
         public long Id { get; set; }
         public string Name { get; set; }
+
+        [DisplayName("Description")]
         public string PackageDescription { get; set; }
+
+        [DataType(DataType.Currency)]
         public decimal BackingAmount { get; set; }
+
+        [DisplayName("Benefits")]
         public string RewardDescription { get; set; }
+
+        [DisplayName("Created on")]
         public DateTime DateCreated { get; set; }
+
+        [DisplayName("Updated on")]
         public DateTime? DateUpdated { get; set; }
+
         public long ProjectId { get; set; }
         public long? AttatchmentSetId { get; set; }
 

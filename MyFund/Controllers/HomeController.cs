@@ -25,7 +25,8 @@ namespace MyFund.Controllers
         {
             var topProjects = await _context.Project
                                 .Include(p => p.ProjectCategory)
-                                .OrderBy(p => p.AmountGathered)
+                                .Where(p => p.StatusId == (long)Status.StatusDescription.Active)
+                                .OrderByDescending(p => p.AmountGathered)
                                 .Take(3)
                                 .ToListAsync();
 
