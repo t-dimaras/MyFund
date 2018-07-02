@@ -38,10 +38,11 @@ namespace MyFund.Controllers
 
                 if (User.Identity.IsAuthenticated)
                 {
-                    var userBackingQuery = from bp in _context.BackingPackage
-                                           from ub in bp.UserBackings
-                                           where ub.UserId == User.GetUserId() && ub.BackingId == bp.Id
+                    var userBackingQuery = from ub in _context.UserBacking
+                                           join bp in projectContext.BackingPackages on ub.BackingId equals bp.Id
+                                           where ub.UserId == User.GetUserId()
                                            select ub;
+
                     await userBackingQuery.LoadAsync();
 
                     if (userBackingQuery.Count() == 1)

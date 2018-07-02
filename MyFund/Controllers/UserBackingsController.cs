@@ -79,9 +79,9 @@ namespace MyFund.Controllers
                 }
                 else if (User.Identity.IsAuthenticated)
                 {
-                    var userBackingQuery = from bp in _context.BackingPackage
-                                           from ub in bp.UserBackings
-                                           where ub.UserId == User.GetUserId() && ub.BackingId == bp.Id
+                    var userBackingQuery = from ub in _context.UserBacking
+                                           join bp in projectContext.BackingPackages on ub.BackingId equals bp.Id
+                                           where ub.UserId == User.GetUserId()
                                            select ub;
 
                     await userBackingQuery.LoadAsync();
@@ -129,11 +129,12 @@ namespace MyFund.Controllers
                 {
                     userBacking.UserId = User.GetUserId().Value;
                     userBacking.Amount = backingPackage.BackingAmount;
-                    userBacking.Backing.Project.AmountGathered += backingPackage.BackingAmount;
+                    backingPackage.Project.AmountGathered += backingPackage.BackingAmount;
 
                     _context.Add(userBacking);
+                    _context.Update(backingPackage.Project);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Details), "Projects", new { Id = backingPackage.ProjectId });
                 }
                 ViewData["BackingId"] = userBacking.BackingId;
                 return View(userBacking.Backing.Project);

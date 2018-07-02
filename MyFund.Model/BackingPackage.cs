@@ -16,12 +16,15 @@ namespace MyFund.Model
         public string Name { get; set; }
 
         [DisplayName("Description")]
+        [DataType(DataType.MultilineText)]
         public string PackageDescription { get; set; }
 
         [DataType(DataType.Currency)]
+        [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = true)]
         public decimal BackingAmount { get; set; }
 
         [DisplayName("Benefits")]
+        [DataType(DataType.MultilineText)]
         public string RewardDescription { get; set; }
 
         [DisplayName("Created on")]

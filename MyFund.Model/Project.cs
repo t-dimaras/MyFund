@@ -18,16 +18,19 @@ namespace MyFund.Model
         public string Title { get; set; }
 
         [DisplayName("Short description")]
+        [DataType(DataType.MultilineText)]
         public string ShortDescription { get; set; }
 
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
 
         [DataType(DataType.Currency)]
+        [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = true)]
         public decimal Goal { get; set; }
 
         [DisplayName("Progress")]
         [DataType(DataType.Currency)]
+        [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = true)]
         public decimal AmountGathered { get; set; }
 
         [DisplayName("Created on")]
@@ -44,11 +47,14 @@ namespace MyFund.Model
         public long ProjectCategoryId { get; set; }
 
         [DisplayName("Project site")]
+        [DataType(DataType.Url)]
         public string Url { get; set; }
+
         public long UserId { get; set; }
         public long? AttatchmentSetId { get; set; }
 
         [DisplayName("Photo url")]
+        [DataType(DataType.ImageUrl)]
         public string MediaUrl { get; set; }
 
         public AttatchmentSet AttatchmentSet { get; set; }

@@ -1,13 +1,15 @@
-﻿@model MyFund.Model.Project
+﻿@using MyFund.Extensions
+@model MyFund.Model.Project
 
 @{
     ViewData["Title"] = "Details";
 }
 
 <div class="row">
-    <div>
-        <div id="project-details">
-            <div class="col-md-7">
+    <div id="project-details" class="col-sm-7">
+        <form id="form-details" asp-action="Edit" method="post">
+            <input type="hidden" asp-for="StatusId" />
+            <div>
                 <h2>Details</h2>
                 <h3>@Html.DisplayFor(model => model.Name)</h3>
                 <hr />
@@ -17,112 +19,150 @@
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.Name)
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="Name" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.Title)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.Title)
+                        <input type="hidden" asp-for="Title" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.ShortDescription)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.ShortDescription)
+                        <input type="hidden" asp-for="ShortDescription" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.Description)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.Description)
+                        <input type="hidden" asp-for="Description" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.Goal)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.Goal)
+                        <input type="hidden" asp-for="Goal" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.AmountGathered)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.AmountGathered)
+                        <input type="hidden" asp-for="AmountGathered" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.DateCreated)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.DateCreated)
+                        <input type="hidden" asp-for="DateCreated" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.DateUpdated)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.DateUpdated)
+                        <input type="hidden" asp-for="DateUpdated" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.Deadline)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.Deadline)
+                        <input type="hidden" asp-for="Deadline" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.Url)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.Url)
+                        <input type="hidden" asp-for="Url" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.MediaUrl)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.MediaUrl)
+                        <input type="hidden" asp-for="MediaUrl" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.AttatchmentSet)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.AttatchmentSet.Id)
+                        <input type="hidden" asp-for="AttatchmentSetId" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.ProjectCategory)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.ProjectCategory.Name)
+                        <input type="hidden" asp-for="ProjectCategoryId" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.Status)
                     </dt>
                     <dd>
-                        @Html.DisplayFor(model => model.Status.Name)
+                        <span id="span-project-status">@Html.DisplayFor(model => model.Status.Name)</span>
+                        <input type="hidden" asp-for="StatusId" />
                     </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.User)
                     </dt>
                     <dd>
                         @Html.DisplayFor(model => model.User.Email)
+                        <input type="hidden" asp-for="UserId" />
                     </dd>
                 </dl>
-            </divclass="col-md-7">
-        </div>
+            </div>
+            <div>
+                @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
+                {
+                    //StatusId ==1 is for Inactive. Should change from hardcoded
+                    @if (Model.BackingPackages.Any() && Model.StatusId == 1)
+                    {
+                        <input type="hidden" name="statusUpdate" value="Publish" id="input-publish-project" />
+                        <input value="Publish" type="submit" id="btn-publish-project" class="btn btn-primary" />
+                    }
+                }
+            </div>
+        </form>
     </div>
-    <div id="project-backing" class="col-md-5">
+    <div id="project-backing" class="col-sm-5">
         @{
             if (User.Identity.IsAuthenticated && Model.StatusId == 2 && Model.BackingPackages.Count > 0)
             {
+                var userBackingQuery = from bp in Model.BackingPackages
+                                       from ub in bp.UserBackings
+                                       where ub.UserId == User.GetUserId() && ub.BackingId == bp.Id
+                                       select ub;
+
+                if (!userBackingQuery.Any())
+                {
                 <div id="backings-nav">
-                    <a asp-Controller="UserBackings" asp-action="Create" asp-route-projectId="@Model.Id" id="btn-user-back-project">Back this project</a>
+                    <a asp-Controller="UserBackings" asp-action="Create" asp-route-projectId="@Model.Id" id="btn-user-back-project" class="btn btn-primary">Back this project</a>
                 </div>
+                    }
+                }
             }
-        }
         </>
         @await Html.PartialAsync("/Views/BackingPackages/_IndexPartial.cshtml", Model)
     </div>
 </div>
-<div class="row col-md-12">
-    @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
-    {
-        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a><span> | </span>
-    }
-    <a asp-action="Index">Back to List</a>
+<div class="row">
+    <div>
+        @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
+        {
+
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-default" role="button">Edit</a>
+        }
+        <a asp-action="Index" class="btn btn-default" role="button">Back to List</a>
+    </div>
 </div>

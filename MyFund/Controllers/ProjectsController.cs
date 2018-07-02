@@ -180,9 +180,9 @@ namespace MyFund.Controllers
             }
             if (User.GetUserId().HasValue && User.GetUserId().Value != project.UserId)
             {
-                var userBackingQuery = from bp in _context.BackingPackage
-                                       from ub in bp.UserBackings
-                                       where ub.UserId == User.GetUserId() && ub.BackingId == bp.Id
+                var userBackingQuery = from ub in _context.UserBacking
+                                       join bp in project.BackingPackages on ub.BackingId equals bp.Id
+                                       where ub.UserId == User.GetUserId()
                                        select ub;
 
                 await userBackingQuery.LoadAsync();
@@ -190,7 +190,7 @@ namespace MyFund.Controllers
                 if (userBackingQuery.Count() == 1)
                 {
                     var userBacking = userBackingQuery.Single();
-                    project.BackingPackages.First(bp => bp.Id == userBacking.BackingId).UserBackings.Add(userBacking);
+                    project.BackingPackages.FirstOrDefault(bp => bp.Id == userBacking.BackingId)?.UserBackings?.Add(userBacking);
                 }
             }
             return View(project);
@@ -283,12 +283,14 @@ namespace MyFund.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,Name,Title,ShortDescription,Description,Goal,AmountGathered,DateCreated,DateUpdated,Deadline,StatusId,ProjectCategoryId,Url,UserId,AttatchmentSetId,MediaUrl")] Project project)
+        public async Task<IActionResult> Edit(string statusUpdate, long id, [Bind("Id,Name,Title,ShortDescription,Description,Goal,AmountGathered,DateCreated,DateUpdated,Deadline,StatusId,ProjectCategoryId,Url,UserId,AttatchmentSetId,MediaUrl")] Project project)
         {
             if (id != project.Id)
             {
                 return NotFound();
             }
+
+            @ViewData["statusUpdateParam"] = statusUpdate;
 
             if (ModelState.IsValid)
             {
@@ -299,6 +301,10 @@ namespace MyFund.Controllers
                     #region try commit
                     try
                     {
+                        if (statusUpdate == "Publish")
+                        {
+                            project.StatusId = (long)Status.StatusDescription.Active;
+                        }
                         project.DateUpdated = DateTime.Now;
                         _context.Update(project);
                         await _context.SaveChangesAsync();
@@ -330,6 +336,7 @@ namespace MyFund.Controllers
             ViewData["ProjectCategoryId"] = new SelectList(_context.ProjectCategory, "Id", "Name", project.ProjectCategoryId);
             ViewData["StatusId"] = new SelectList(_context.Status, "Id", "Name", project.StatusId);
             ViewData["UserId"] = new SelectList(_context.User, "Id", "Email", project.UserId);
+            @ViewData["statusUpdateParam"] = "publish_done";
             return View(project);
         }
 
