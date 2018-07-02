@@ -74,7 +74,9 @@ namespace MyFund
                                  .RequireAuthenticatedUser()
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1); ;
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddTransient<CategoriesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

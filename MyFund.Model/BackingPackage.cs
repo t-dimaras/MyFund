@@ -19,6 +19,7 @@ namespace MyFund.Model
         [DataType(DataType.MultilineText)]
         public string PackageDescription { get; set; }
 
+        [DisplayName("Pledge")]
         [DataType(DataType.Currency)]
         [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = true)]
         public decimal BackingAmount { get; set; }
