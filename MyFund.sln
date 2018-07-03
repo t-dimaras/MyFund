@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFund", "MyFund\MyFund.csproj", "{3FC39F89-AE46-4C2C-970F-2F917F98AD5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyFund", "MyFund\MyFund.csproj", "{3FC39F89-AE46-4C2C-970F-2F917F98AD5C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{277D09D1-3AF6-42BC-A55B-60E68CBD2835} = {277D09D1-3AF6-42BC-A55B-60E68CBD2835}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFund.Model", "MyFund.Model\MyFund.Model.csproj", "{277D09D1-3AF6-42BC-A55B-60E68CBD2835}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyFund.DataModel", "MyFund.Model\MyFund.DataModel.csproj", "{277D09D1-3AF6-42BC-A55B-60E68CBD2835}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
