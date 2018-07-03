@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyFund.Model\MyFund.DataModel.csproj" />
+    <ProjectReference Include="..\MyFund.DataModel\MyFund.DataModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
