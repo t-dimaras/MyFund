@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyFund.Extensions;
-using MyFund.Model;
+using MyFund.DataModel;
 using Remotion.Linq.Clauses.ResultOperators;
 
 namespace MyFund.Controllers

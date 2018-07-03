@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace MyFund.Model
+namespace MyFund.DataModel
 {
     public partial class CrowdContext: IdentityDbContext<User, IdentityRole<long>, long>
     {

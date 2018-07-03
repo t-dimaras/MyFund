@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyFund.Model
+namespace MyFund.DataModel
 {
     public partial class BackingPackage : IResource
     {

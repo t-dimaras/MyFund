@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MyFund.Extensions;
-using MyFund.Model;
+using MyFund.DataModel;
 
 namespace MyFund.Controllers
 {

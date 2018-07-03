@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MyFund.Model
+namespace MyFund.DataModel
 {
     public partial class AttatchmentSet
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using MyFund.Extensions;
-using MyFund.Model;
+using MyFund.DataModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

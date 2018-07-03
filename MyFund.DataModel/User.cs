@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace MyFund.Model
+namespace MyFund.DataModel
 {
     public partial class User: IdentityUser<long>
     {
