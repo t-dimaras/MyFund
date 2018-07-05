@@ -116,22 +116,24 @@
     </div>
     <div id="project-backing" class="col-sm-5">
         @{
-            if (User.Identity.IsAuthenticated && Model.StatusId == 2 && Model.BackingPackages.Count > 0)
+            if (!(await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
             {
-                var userBackingQuery = from bp in Model.BackingPackages
-                                       from ub in bp.UserBackings
-                                       where ub.UserId == User.GetUserId() && ub.BackingId == bp.Id
-                                       select ub;
-
-                if (!userBackingQuery.Any())
+                if (User.Identity.IsAuthenticated && Model.StatusId == 2 && Model.BackingPackages.Count > 0)
                 {
-                <div id="backings-nav">
-                    <a asp-Controller="UserBackings" asp-action="Create" asp-route-projectId="@Model.Id" id="btn-user-back-project" class="btn btn-primary">Back this project</a>
-                </div>
+                    var userBackingQuery = from bp in Model.BackingPackages
+                                           from ub in bp.UserBackings
+                                           where ub.UserId == User.GetUserId() && ub.BackingId == bp.Id
+                                           select ub;
+
+                    if (!userBackingQuery.Any())
+                    {
+                        <div id="backings-nav">
+                            <a asp-Controller="UserBackings" asp-action="Create" asp-route-projectId="@Model.Id" id="btn-user-back-project" class="btn btn-primary">Back this project</a>
+                        </div>
                     }
                 }
             }
-        </>
+        }
         @await Html.PartialAsync("/Views/BackingPackages/_IndexPartial.cshtml", Model)
     </div>
 </div>
