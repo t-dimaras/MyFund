@@ -61,7 +61,7 @@ namespace MyFund.Controllers
             #region search
             ViewData["categoryId"] = categoryId;
             ViewData["currentFilter"] = searchString;
-            ViewData["isIncludeDescChecked"] = includeDesChecked;
+            ViewData["includeDesChecked"] = includeDesChecked;
             bool isIncludeDesChecked = includeDesChecked == "on";
 
             projectContext = FilterProjects(projectContext, searchString, isIncludeDesChecked, categoryId);
@@ -87,19 +87,19 @@ namespace MyFund.Controllers
             var filteredContext = projectContext;
             if (categoryId > 0)
             {
-                filteredContext = projectContext.Where(p => p.ProjectCategoryId == categoryId);
+                filteredContext = filteredContext.Where(p => p.ProjectCategoryId == categoryId);
             }
             if (!String.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.Trim();
                 if (!filterShortDescription)
                 {
-                    filteredContext = projectContext.Where(p => p.Name.Contains(searchString)
+                    filteredContext = filteredContext.Where(p => p.Name.Contains(searchString)
                                                              || p.Title.Contains(searchString));
                 }
                 else
                 {
-                    filteredContext = projectContext.Where(p => p.Name.Contains(searchString)
+                    filteredContext = filteredContext.Where(p => p.Name.Contains(searchString)
                                                              || p.Title.Contains(searchString)
                                                              || p.ShortDescription.Contains(searchString));
                 }
@@ -147,7 +147,7 @@ namespace MyFund.Controllers
                     sortedContext = sortedContext.OrderBy(p => p.Goal);
                     break;
                 case "DateCreated":
-                    sortedContext = sortedContext.OrderByDescending(p => p.DateCreated);
+                    sortedContext = sortedContext.OrderBy(p => p.DateCreated);
                     break;
                 case "dateCreated_desc":
                     sortedContext = sortedContext.OrderByDescending(p => p.DateCreated);

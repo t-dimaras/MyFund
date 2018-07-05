@@ -17,9 +17,10 @@ namespace MyFund.Services
             _context = context;
         }
 
-        public async Task<List<ProjectCategory>> GetCategoriesAsync()
+        public IAsyncEnumerable<ProjectCategory> GetCategories()
         {
-            return await _context.ProjectCategory.OrderBy(cat => cat.Name).ToListAsync();
+            var asyncCategories = _context.ProjectCategory.OrderBy(cat => cat.Name).ToAsyncEnumerable();
+            return asyncCategories;
         }
     }
 }
