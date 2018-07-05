@@ -6,6 +6,13 @@
 }
 
 <div class="row">
+    <div class="col-sm-12">
+        <h2>@Html.DisplayFor(model => model.Name)</h2>
+
+        <h3>@Html.DisplayFor(model => model.Title)</h3>
+    </div>
+</div>
+<div class="row">
     <div id="project-details" class="col-sm-7">
         <form id="form-details" asp-action="Edit" method="post">
             <input type="hidden" asp-for="StatusId" />
@@ -26,10 +33,7 @@
             <input type="hidden" asp-for="UserId" />
 
             <div>
-                <h2>@Html.DisplayFor(model => model.Name)</h2>
 
-                <h3>@Html.DisplayFor(model => model.Title)</h3>
-                <hr />
                     <p class="lead">@Html.DisplayFor(model => model.ShortDescription)</p>
                     <p>@Html.DisplayFor(model => model.Description)</p>
                 <dl class="dl-horizontal">
