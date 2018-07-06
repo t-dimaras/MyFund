@@ -4,10 +4,10 @@
 @{
     ViewData["Title"] = "Index";
 }
-<div class="row">
-    <div class="col-sm-2">
+<div row="nav">
+    <div class="col-sm-12">
         <h4>Categories</h4>
-        <ul class="nav nav-pills nav-stacked" id="nav-categories">
+        <ul class="nav nav-pills " id="nav-categories">
             @{
                 var categories = CategoriesServiceInjection.GetCategories();
                 foreach (var category in categories.ToEnumerable())
@@ -20,7 +20,9 @@
             }
         </ul>
     </div>
-    <div class="col-sm-10">
+</div>
+<div class="row">
+    <div class="col-sm-12">
         <h2>Index</h2>
          <form asp-action="Index" method="get">
             <div class="form-actions no-color">
@@ -33,13 +35,13 @@
                 </p>
             </div>
         </form>
-        <table class="table" col="col-md-9">
+        <table class="table">
             <thead>
                 <tr>
                     <th>
                         <a asp-action="Index" asp-route-categoryId="@ViewData["categoryId"]" asp-route-sortOrder="@ViewData["NameSortParam"]">@Html.DisplayNameFor(model => model.Name)</a>
                     </th>
-                    <th class="col-md-3">
+                    <th class="col-sm-4">
                         @Html.DisplayNameFor(model => model.ShortDescription)
                     </th>
                     <th>
