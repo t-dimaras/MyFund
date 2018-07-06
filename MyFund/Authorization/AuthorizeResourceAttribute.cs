@@ -10,6 +10,17 @@ using System.Threading.Tasks;
 
 namespace MyFund.Authorization
 {
+    /// <summary>
+    /// Custom Authorization FilterAttribute, which checks whether a user satisfies a requirement to become authorized to access an IResource object
+    /// </summary>
+    /// <param name="requirementType">The Type of an IAuthorizationRequirement requirement</param>
+    /// <param name="resourceType">The Type of an IResource object</param>
+    /// <param name="resourceNavigationIdProperty">The name of the property field of the IResource object, that navigates to its parent</param>
+    /// <example>
+    /// <code>
+    /// [AuthorizeResource[(typeof(AuthorizationRequirement), typeof(IResource)]
+    /// </code>
+    /// </example>
     public class AuthorizeResourceAttribute : TypeFilterAttribute
     {
         /// <summary>
@@ -17,12 +28,16 @@ namespace MyFund.Authorization
         /// </summary>
         /// <param name="requirementType">The Type of an IAuthorizationRequirement requirement</param>
         /// <param name="resourceType">The Type of an IResource object</param>
-        /// <param name="resourceNavigationIdProperty">The name of the property field of the IResource object, that navigates to its parent</param>
-        /// <example>[AuthorizeResource[(typeof(AuthorizationRequirement), typeof(IResource)]</example>
-        public AuthorizeResourceAttribute(Type requirementType, Type resourceType, string resourceNavigationIdProperty = "")
+        /// <param name="resourceNavigationProperty">The name of the property field of the IResource object, that navigates to its parent</param>
+        /// <example>
+        /// <code>
+        /// [AuthorizeResource[(typeof(AuthorizationRequirement), typeof(IResource)]
+        /// </code>
+        /// </example>
+        public AuthorizeResourceAttribute(Type requirementType, Type resourceType, string resourceNavigationProperty = "")
             : base(typeof(AuthorizeResourceFilter))
         {
-            Arguments = new object[] { requirementType, resourceType, resourceNavigationIdProperty };
+            Arguments = new object[] { requirementType, resourceType, resourceNavigationProperty };
         }
 
         private class AuthorizeResourceFilter : IAsyncActionFilter
@@ -31,19 +46,19 @@ namespace MyFund.Authorization
             private readonly Type _requirementType;
             private readonly CrowdContext _context;
             private readonly Type _resourceType;
-            private readonly string _resourceNavigationIdProperty;
+            private readonly string _resourceNavigationProperty;
 
             public AuthorizeResourceFilter(CrowdContext context, 
                                             IAuthorizationService authorizationService,
                                             Type requirementType, 
                                             Type resourceType,
-                                            string resourceNavigationIdProperty)
+                                            string resourceNavigationProperty)
             {
                 _context = context;
                 _authorizationService = authorizationService;
                 _requirementType = requirementType;
                 _resourceType = resourceType;
-                _resourceNavigationIdProperty = resourceNavigationIdProperty;
+                _resourceNavigationProperty = resourceNavigationProperty;
             }
 
             /// <summary>
@@ -60,9 +75,9 @@ namespace MyFund.Authorization
                 
                 var resource = await _context.FindAsync(_resourceType, resourceId);
 
-                if (!string.IsNullOrEmpty(_resourceNavigationIdProperty))
+                if (!string.IsNullOrEmpty(_resourceNavigationProperty))
                 {
-                    await _context.Entry(resource).Reference(_resourceNavigationIdProperty).LoadAsync();
+                    await _context.Entry(resource).Reference(_resourceNavigationProperty).LoadAsync();
                 }
                 
                 if (resource == null)
