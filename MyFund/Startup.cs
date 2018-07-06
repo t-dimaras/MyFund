@@ -128,7 +128,7 @@ namespace MyFund
             //Thumbnail files
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider(Configuration["ImageFilePaths:DefaultImageFilePath"]),
+                FileProvider = new PhysicalFileProvider(Configuration["ImageFilePaths:ThumbnailsFilePath"]),
                 RequestPath = "/Thumbnails",
                 OnPrepareResponse = ctx =>
                 {
