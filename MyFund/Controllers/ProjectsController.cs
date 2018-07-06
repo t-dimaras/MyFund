@@ -225,7 +225,6 @@ namespace MyFund.Controllers
 
             #region project derived and default values
             project.UserId = User.GetUserId().Value;
-            project.DateCreated = DateTime.Now;
             project.AmountGathered = 0;
             project.StatusId = (long)Status.StatusDescription.Inactive;
             #endregion
@@ -242,7 +241,6 @@ namespace MyFund.Controllers
         }
 
         // GET: Projects/Edit/5
-        //[Authorize(Policy = "ProjectCreator")]
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null)
@@ -283,9 +281,15 @@ namespace MyFund.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string statusUpdate, long id, [Bind("Id,Name,Title,ShortDescription,Description,Goal,AmountGathered,DateCreated,DateUpdated,Deadline,StatusId,ProjectCategoryId,Url,UserId,AttatchmentSetId,MediaUrl")] Project project)
+        public async Task<IActionResult> Edit(string statusUpdate, long id, Project project)
         {
             if (id != project.Id)
+            {
+                return NotFound();
+            }
+            var existingProject = await _context.Project.FindAsync(id);
+
+            if (existingProject == null)
             {
                 return NotFound();
             }
@@ -303,10 +307,18 @@ namespace MyFund.Controllers
                     {
                         if (statusUpdate == "Publish")
                         {
-                            project.StatusId = (long)Status.StatusDescription.Active;
+                            existingProject.StatusId = (long)Status.StatusDescription.Active;
                         }
-                        project.DateUpdated = DateTime.Now;
-                        _context.Update(project);
+                        existingProject.Deadline = project.Deadline;
+                        existingProject.Description = project.Description;
+                        existingProject.Goal = project.Goal;
+                        existingProject.MediaUrl = project.MediaUrl;
+                        existingProject.Name = project.Name;
+                        existingProject.ProjectCategoryId = project.ProjectCategoryId;
+                        existingProject.ShortDescription = project.ShortDescription;
+                        existingProject.Title = project.Title;
+                        existingProject.Url = project.Url;
+                        _context.Update(existingProject);
                         await _context.SaveChangesAsync();
                     }
                     catch (DbUpdateConcurrencyException)

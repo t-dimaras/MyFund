@@ -127,6 +127,17 @@ namespace MyFund.DataModel
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_82");
+
+                entity.Property(e => e.DateUpdated)
+                    .HasColumnType("datetime2(7)")
+                    .ValueGeneratedOnUpdate()
+                    .HasDefaultValueSql("GETDATE()");
+
+                entity.Property(e => e.DateCreated)
+                    .HasColumnName("DateCreated")
+                    .IsRequired()
+                    .HasColumnType("datetime2(7)")
+                    .HasDefaultValueSql("GETDATE()");
             });
 
             modelBuilder.Entity<ProjectCategory>(entity =>

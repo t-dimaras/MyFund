@@ -20,9 +20,21 @@ namespace MyFund
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+
+            //Configuration = builder.Build();
+            Configuration = builder.AddConfiguration(configuration).Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -38,8 +50,7 @@ namespace MyFund
             });
 
             services.AddDbContext<CrowdContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration["ConnectionStrings:AzureConnection"]));
 
             services.AddIdentity<User, IdentityRole<long>>()
                 .AddDefaultUI()

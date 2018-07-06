@@ -25,7 +25,7 @@ namespace MyFund.DataModel
         public string Description { get; set; }
 
         [DataType(DataType.Currency)]
-        [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = false)]
         public decimal Goal { get; set; }
 
         [DisplayName("Progress")]
