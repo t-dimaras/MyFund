@@ -15,6 +15,7 @@ using MyFund.DataModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using MyFund.Services;
+using MyFund.Authorization;
 
 namespace MyFund
 {
@@ -50,7 +51,7 @@ namespace MyFund
             });
 
             services.AddDbContext<CrowdContext>(options =>
-                options.UseSqlServer(Configuration["ConnectionStrings:AzureConnection"]));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<User, IdentityRole<long>>()
                 .AddDefaultUI()

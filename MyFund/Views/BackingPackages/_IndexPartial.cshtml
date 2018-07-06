@@ -6,7 +6,7 @@
     if (authorizationResult.Succeeded)
     {
         <p>
-            <a asp-controller="BackingPackages" asp-action="Create" asp-route-id="@Model.Id">Create New</a>
+            <a asp-controller="BackingPackages" asp-action="Create" asp-route-projectId="@Model.Id">Create new package</a>
         </p>
     }
     else

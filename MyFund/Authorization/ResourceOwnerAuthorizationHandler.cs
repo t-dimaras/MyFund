@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyFund.Services
+namespace MyFund.Authorization
 {
     public class ResourceOwnerAuthorizationHandler : AuthorizationHandler<ResourceOwnerRequirement, IResource>
     {
@@ -14,7 +14,13 @@ namespace MyFund.Services
                                                        ResourceOwnerRequirement requirement,
                                                        IResource resource)
         {
-            if (context.User.GetUserId() == resource.GetResourceOwnerId())
+            if(!(context.Resource is IResource))
+            {
+                context.Fail();
+            }
+
+            if (resource?.GetResourceOwnerId() > 0
+                && context.User.GetUserId() == resource.GetResourceOwnerId())
             {
                 context.Succeed(requirement);
             }

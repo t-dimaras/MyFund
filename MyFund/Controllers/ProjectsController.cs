@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyFund.Extensions;
 using MyFund.DataModel;
+using MyFund.Services;
+using MyFund.Authorization;
 
 namespace MyFund.Controllers
 {
@@ -241,6 +243,7 @@ namespace MyFund.Controllers
         }
 
         // GET: Projects/Edit/5
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null)
@@ -281,6 +284,7 @@ namespace MyFund.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
         public async Task<IActionResult> Edit(string statusUpdate, long id, Project project)
         {
             if (id != project.Id)
@@ -353,6 +357,7 @@ namespace MyFund.Controllers
         }
 
         // GET: Projects/Delete/5
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null)
@@ -377,6 +382,7 @@ namespace MyFund.Controllers
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
             var project = await _context.Project.FindAsync(id);
