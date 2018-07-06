@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -56,6 +57,12 @@ namespace MyFund.DataModel
         [DisplayName("Photo url")]
         [DataType(DataType.ImageUrl)]
         public string MediaUrl { get; set; }
+
+
+        //Ignored in context. Check mappings of entity Project
+        [DisplayName("Photo")]
+        [DataType(DataType.Upload)]
+        public IFormFile Media { get; set; }
 
         public AttatchmentSet AttatchmentSet { get; set; }
 

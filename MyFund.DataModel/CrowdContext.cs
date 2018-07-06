@@ -86,8 +86,10 @@ namespace MyFund.DataModel
                 entity.Property(e => e.Goal).HasColumnType("decimal(9, 2)");
 
                 entity.Property(e => e.MediaUrl)
-                    .HasColumnName("MediaURL")
-                    .HasMaxLength(1000);
+                    .HasColumnName("MediaURL");
+
+                //Do not map IFormFile Project.Media to database
+                entity.Ignore(e => e.Media);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -102,8 +104,7 @@ namespace MyFund.DataModel
                     .HasMaxLength(50);
 
                 entity.Property(e => e.Url)
-                    .HasColumnName("URL")
-                    .HasMaxLength(255);
+                    .HasColumnName("URL");
 
                 entity.HasOne(d => d.AttatchmentSet)
                     .WithMany(p => p.Project)

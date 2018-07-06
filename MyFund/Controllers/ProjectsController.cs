@@ -12,6 +12,8 @@ using MyFund.Extensions;
 using MyFund.DataModel;
 using MyFund.Services;
 using MyFund.Authorization;
+using System.Net;
+using System.IO;
 
 namespace MyFund.Controllers
 {
@@ -253,30 +255,19 @@ namespace MyFund.Controllers
 
             var project = await _context.Project
                                     .Include(p=>p.BackingPackages)
+                                    .Include(p=>p.AttatchmentSet)
+                                        .ThenInclude(aSet => aSet.Attatchments)
                                     .FirstOrDefaultAsync(p=>p.Id == id);
             if (project == null)
             {
                 return NotFound();
             }
 
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, project, "ProjectCreator");
-
-            if (authorizationResult.Succeeded)
-            {
-                ViewData["AttatchmentSetId"] = project.AttatchmentSetId;
-                ViewData["ProjectCategoryId"] = new SelectList(_context.ProjectCategory, "Id", "Name");
-                ViewData["StatusId"] = project.StatusId;
-                ViewData["UserId"] = project.UserId;
-                return View(project);
-            }
-            else if (User.Identity.IsAuthenticated)
-            {
-                return new ForbidResult();
-            }
-            else
-            {
-                return new ChallengeResult();
-            }
+            ViewData["AttatchmentSetId"] = project.AttatchmentSetId;
+            ViewData["ProjectCategoryId"] = new SelectList(_context.ProjectCategory, "Id", "Name");
+            ViewData["StatusId"] = project.StatusId;
+            ViewData["UserId"] = project.UserId;
+            return View(project);
         }
 
         // POST: Projects/Edit/5
@@ -302,51 +293,55 @@ namespace MyFund.Controllers
 
             if (ModelState.IsValid)
             {
-                var authorizationResult = await _authorizationService.AuthorizeAsync(User, project, "ProjectCreator");
+                #region try commit
+                try
+                {
+                    if (statusUpdate == "Publish")
+                    {
+                        existingProject.StatusId = (long)Status.StatusDescription.Active;
+                    }
+                    #region photo
 
-                if (authorizationResult.Succeeded)
-                {
-                    #region try commit
-                    try
+                    var fileName = WebUtility.HtmlEncode(Path.GetFileName(project.Media.FileName));
+
+                    if (project.Media.ContentType.ToLower() != "image/jpg")
                     {
-                        if (statusUpdate == "Publish")
-                        {
-                            existingProject.StatusId = (long)Status.StatusDescription.Active;
-                        }
-                        existingProject.Deadline = project.Deadline;
-                        existingProject.Description = project.Description;
-                        existingProject.Goal = project.Goal;
-                        existingProject.MediaUrl = project.MediaUrl;
-                        existingProject.Name = project.Name;
-                        existingProject.ProjectCategoryId = project.ProjectCategoryId;
-                        existingProject.ShortDescription = project.ShortDescription;
-                        existingProject.Title = project.Title;
-                        existingProject.Url = project.Url;
-                        _context.Update(existingProject);
-                        await _context.SaveChangesAsync();
+                        ModelState.AddModelError(project.Media.Name,
+                            $"The file ({fileName}) must be a text file.");
                     }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!ProjectExists(project.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                    return RedirectToAction(nameof(Dashboard));
+
+
+
                     #endregion
+                    existingProject.Deadline = project.Deadline;
+                    existingProject.Description = project.Description;
+                    existingProject.Goal = project.Goal;
+                    existingProject.MediaUrl = project.MediaUrl;
+                    existingProject.Name = project.Name;
+                    existingProject.ProjectCategoryId = project.ProjectCategoryId;
+                    existingProject.ShortDescription = project.ShortDescription;
+                    existingProject.Title = project.Title;
+                    existingProject.Url = project.Url;
+                    _context.Update(existingProject);
+                    await _context.SaveChangesAsync();
                 }
-                else if (User.Identity.IsAuthenticated)
+                catch (IOException)
                 {
-                    return new ForbidResult();
+                    return View(project);
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    return new ChallengeResult();
+                    if (!ProjectExists(project.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
+                return RedirectToAction(nameof(Details));
+                #endregion
             }
             ViewData["AttatchmentSetId"] = new SelectList(_context.AttatchmentSet, "Id", "Id", project.AttatchmentSetId);
             ViewData["ProjectCategoryId"] = new SelectList(_context.ProjectCategory, "Id", "Name", project.ProjectCategoryId);

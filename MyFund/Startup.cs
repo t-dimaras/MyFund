@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using MyFund.Services;
 using MyFund.Authorization;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace MyFund
 {
@@ -106,7 +108,37 @@ namespace MyFund
             }
 
             app.UseHttpsRedirection();
+
+            #region File settings
             app.UseStaticFiles();
+
+            //Image files
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Configuration["ImageFilePaths:DefaultImageFilePath"]),
+                RequestPath = "/Images",
+                OnPrepareResponse = ctx =>
+                {
+                    // Requires the following import:
+                    // using Microsoft.AspNetCore.Http;
+                    ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
+                }
+            });
+
+            //Thumbnail files
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Configuration["ImageFilePaths:DefaultImageFilePath"]),
+                RequestPath = "/Thumbnails",
+                OnPrepareResponse = ctx =>
+                {
+                    // Requires the following import:
+                    // using Microsoft.AspNetCore.Http;
+                    ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
+                }
+            });
+            #endregion
+
             app.UseCookiePolicy();
 
             app.UseAuthentication();
