@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MyFund.Model.Project>
+﻿@model IEnumerable<Project>
 @inject MyFund.Services.CategoriesService CategoriesServiceInjection
 
 @{
@@ -9,11 +9,11 @@
         <h4>Categories</h4>
         <ul class="nav nav-pills nav-stacked" id="nav-categories">
             @{
-                var categories = await CategoriesServiceInjection.GetCategoriesAsync();
-                foreach (var category in categories)
+                var categories = CategoriesServiceInjection.GetCategories();
+                foreach (var category in categories.ToEnumerable())
                 {
                     var isSelectedCategory = long.TryParse(ViewData["categoryId"].ToString(), out long selectedCategoryId);
-                    <li class="@((isSelectedCategory && category.Id == selectedCategoryId) ? "active": "" )">
+                    <li class="@((isSelectedCategory && category.Id == selectedCategoryId) ? "active" : "" )">
                         <a asp-action="Index" asp-route-categoryId="@category.Id">@category.Name</a>
                     </li>
                 }
@@ -26,8 +26,9 @@
             <div class="form-actions no-color">
                 <p>
                     Search: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
-                    <input type="submit" value="Search" class="btn btn-default" asp-route-categoryId="@ViewData["categoryId"]" /> |
-                    Include short description: <input type="checkbox" class="checkbox checkbox-inline" name="IncludeDesChecked" id="check-include-desc" value="@ViewData["includeDesChecked"]" /> |
+                    <input type="hidden" name="categoryId" value="@ViewData["categoryId"]" />
+                    <input type="submit" value="Search" class="btn btn-default"  />
+                    <span>Include short description: <input type="checkbox" class="checkbox checkbox-inline" name="IncludeDesChecked" id="check-include-desc" value="@ViewData["includeDesChecked"]" @((ViewData["includeDesChecked"]?.ToString().Trim() == "on") ? "checked=checked" : "") /></span> |
                     <a asp-action="Index" >Back to Full List</a>
                 </p>
             </div>

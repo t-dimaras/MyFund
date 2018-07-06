@@ -1,10 +1,17 @@
 ﻿@using MyFund.Extensions
-@model MyFund.Model.Project
+@model Project
 
 @{
     ViewData["Title"] = "Details";
 }
 
+<div class="row">
+    <div class="col-sm-12">
+        <h2>@Html.DisplayFor(model => model.Name)</h2>
+
+        <h3>@Html.DisplayFor(model => model.Title)</h3>
+    </div>
+</div>
 <div class="row">
     <div id="project-details" class="col-sm-7">
         <form id="form-details" asp-action="Edit" method="post">
@@ -26,12 +33,9 @@
             <input type="hidden" asp-for="UserId" />
 
             <div>
-                <h2>@Html.DisplayFor(model => model.Name)</h2>
 
-                <h3>@Html.DisplayFor(model => model.Title)</h3>
-                <hr />
-                    <p class="lead">@Html.DisplayFor(model => model.ShortDescription)</p>
-                    <p>@Html.DisplayFor(model => model.Description)</p>
+                <p class="lead">@Html.DisplayFor(model => model.ShortDescription)</p>
+                <p>@Html.DisplayFor(model => model.Description)</p>
                 <dl class="dl-horizontal">
                     <dt>
                         @Html.DisplayNameFor(model => model.Goal)
@@ -112,36 +116,39 @@
                     }
                 }
             </div>
+            <div>
+                @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
+                {
+
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-default" role="button">Edit</a>
+                }
+                <a asp-action="Index" class="btn btn-default" role="button">Back to List</a>
+            </div>
+
         </form>
     </div>
     <div id="project-backing" class="col-sm-5">
         @{
-            if (User.Identity.IsAuthenticated && Model.StatusId == 2 && Model.BackingPackages.Count > 0)
+            if (!(await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
             {
-                var userBackingQuery = from bp in Model.BackingPackages
-                                       from ub in bp.UserBackings
-                                       where ub.UserId == User.GetUserId() && ub.BackingId == bp.Id
-                                       select ub;
-
-                if (!userBackingQuery.Any())
+                if (User.Identity.IsAuthenticated && Model.StatusId == 2 && Model.BackingPackages.Count > 0)
                 {
-                <div id="backings-nav">
-                    <a asp-Controller="UserBackings" asp-action="Create" asp-route-projectId="@Model.Id" id="btn-user-back-project" class="btn btn-primary">Back this project</a>
-                </div>
+                    var userBackingQuery = from bp in Model.BackingPackages
+                                           from ub in bp.UserBackings
+                                           where ub.UserId == User.GetUserId() && ub.BackingId == bp.Id
+                                           select ub;
+
+                    if (!userBackingQuery.Any())
+                    {
+                        <div id="backings-nav">
+                            <a asp-Controller="UserBackings" asp-action="Create" asp-route-projectId="@Model.Id" id="btn-user-back-project" class="btn btn-primary">Back this project</a>
+                        </div>
                     }
                 }
             }
-        </>
+        }
         @await Html.PartialAsync("/Views/BackingPackages/_IndexPartial.cshtml", Model)
     </div>
 </div>
 <div class="row">
-    <div>
-        @if ((await AuthorizationService.AuthorizeAsync(User, Model, "ProjectCreator")).Succeeded)
-        {
-
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-default" role="button">Edit</a>
-        }
-        <a asp-action="Index" class="btn btn-default" role="button">Back to List</a>
-    </div>
 </div>

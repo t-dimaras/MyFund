@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyFund.Model
+namespace MyFund.DataModel
 {
     public partial class Project : IResource
     {
@@ -25,7 +25,7 @@ namespace MyFund.Model
         public string Description { get; set; }
 
         [DataType(DataType.Currency)]
-        [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = false)]
         public decimal Goal { get; set; }
 
         [DisplayName("Progress")]

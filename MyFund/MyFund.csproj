@@ -11,12 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyFund.Model\MyFund.Model.csproj" />
+    <Folder Include="Areas\Identity\Services\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Identity\Services\" />
-    <Folder Include="Data\" />
+    <ProjectReference Include="..\MyFund.DataModel\MyFund.DataModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

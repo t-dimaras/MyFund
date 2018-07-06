@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using MyFund.Model;
+using MyFund.DataModel;
 
 namespace MyFund.Areas.Identity.Pages.Account
 {

@@ -1,4 +1,4 @@
-﻿@model MyFund.Model.Project
+﻿@model Project
 
 <h4>Pledge tiers</h4>
 @{
@@ -6,7 +6,7 @@
     if (authorizationResult.Succeeded)
     {
         <p>
-            <a asp-controller="BackingPackages" asp-action="Create" asp-route-id="@Model.Id">Create New</a>
+            <a asp-controller="BackingPackages" asp-action="Create" asp-route-projectId="@Model.Id">Create new package</a>
         </p>
     }
     else

@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MyFund.Extensions;
-using MyFund.Model;
+using MyFund.DataModel;
+using MyFund.Services;
+using MyFund.Authorization;
 
 namespace MyFund.Controllers
 {
@@ -87,18 +89,18 @@ namespace MyFund.Controllers
         }
 
         // GET: BackingPackages/Create/4
-        [HttpGet("BackingPackages/Create/{id?}")]
-        public async Task<IActionResult> Create(long? id)
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
+        public async Task<IActionResult> Create(long projectId)
         {
-            if (id.HasValue)
+            if (projectId > 0)
             {
-                var projectContext = await _context.Project.FindAsync(id.Value);
+                var projectContext = await _context.Project.FindAsync(projectId);
                 if (projectContext == null)
                 {
                     return NotFound();
                 }
 
-                ViewData["ProjectId"] = id.Value;
+                ViewData["ProjectId"] = projectId;
                 return View();
             }
             else
@@ -110,9 +112,10 @@ namespace MyFund.Controllers
         // POST: BackingPackages/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost("BackingPackages/Create/{projectId?}")]
+        [HttpPost("BackingPackages/Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,PackageDescription,BackingAmount,RewardDescription,DateCreated,DateUpdated,ProjectId,AttatchmentSetId")] BackingPackage backingPackage)
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
+        public async Task<IActionResult> Create(long projectId, [Bind("Id,Name,PackageDescription,BackingAmount,RewardDescription,DateCreated,DateUpdated,ProjectId,AttatchmentSetId")] BackingPackage backingPackage)
         {
             if (ModelState.IsValid)
             {
@@ -125,6 +128,7 @@ namespace MyFund.Controllers
         }
 
         // GET: BackingPackages/Edit/5
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(BackingPackage), "Project")]
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null)
@@ -147,6 +151,7 @@ namespace MyFund.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(BackingPackage), "Project")]
         public async Task<IActionResult> Edit(long id, [Bind("Id,Name,PackageDescription,BackingAmount,RewardDescription,DateCreated,DateUpdated,ProjectId,AttatchmentSetId")] BackingPackage backingPackage)
         {
             if (id != backingPackage.Id)
@@ -180,6 +185,7 @@ namespace MyFund.Controllers
         }
 
         // GET: BackingPackages/Delete/5
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(BackingPackage), "Project")]
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null)
@@ -202,6 +208,7 @@ namespace MyFund.Controllers
         // POST: BackingPackages/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(BackingPackage), "Project")]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
             var backingPackage = await _context.BackingPackage.FindAsync(id);

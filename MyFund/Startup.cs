@@ -11,18 +11,31 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MyFund.Model;
+using MyFund.DataModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using MyFund.Services;
+using MyFund.Authorization;
 
 namespace MyFund
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+
+            //Configuration = builder.Build();
+            Configuration = builder.AddConfiguration(configuration).Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -37,18 +50,8 @@ namespace MyFund
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
-            {
-                services.AddDbContext<CrowdContext>(options =>
-                    options.UseSqlServer(
-                        Configuration.GetConnectionString("AzureConnection")));
-            }
-            else
-            {
-                services.AddDbContext<CrowdContext>(options =>
-                    options.UseSqlServer(
-                        Configuration.GetConnectionString("DefaultConnection")));
-            }
+            services.AddDbContext<CrowdContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<User, IdentityRole<long>>()
                 .AddDefaultUI()

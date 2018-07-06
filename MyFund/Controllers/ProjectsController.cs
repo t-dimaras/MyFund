@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyFund.Extensions;
-using MyFund.Model;
+using MyFund.DataModel;
+using MyFund.Services;
+using MyFund.Authorization;
 
 namespace MyFund.Controllers
 {
@@ -61,7 +63,7 @@ namespace MyFund.Controllers
             #region search
             ViewData["categoryId"] = categoryId;
             ViewData["currentFilter"] = searchString;
-            ViewData["isIncludeDescChecked"] = includeDesChecked;
+            ViewData["includeDesChecked"] = includeDesChecked;
             bool isIncludeDesChecked = includeDesChecked == "on";
 
             projectContext = FilterProjects(projectContext, searchString, isIncludeDesChecked, categoryId);
@@ -87,19 +89,19 @@ namespace MyFund.Controllers
             var filteredContext = projectContext;
             if (categoryId > 0)
             {
-                filteredContext = projectContext.Where(p => p.ProjectCategoryId == categoryId);
+                filteredContext = filteredContext.Where(p => p.ProjectCategoryId == categoryId);
             }
             if (!String.IsNullOrEmpty(searchString))
             {
                 searchString = searchString.Trim();
                 if (!filterShortDescription)
                 {
-                    filteredContext = projectContext.Where(p => p.Name.Contains(searchString)
+                    filteredContext = filteredContext.Where(p => p.Name.Contains(searchString)
                                                              || p.Title.Contains(searchString));
                 }
                 else
                 {
-                    filteredContext = projectContext.Where(p => p.Name.Contains(searchString)
+                    filteredContext = filteredContext.Where(p => p.Name.Contains(searchString)
                                                              || p.Title.Contains(searchString)
                                                              || p.ShortDescription.Contains(searchString));
                 }
@@ -147,7 +149,7 @@ namespace MyFund.Controllers
                     sortedContext = sortedContext.OrderBy(p => p.Goal);
                     break;
                 case "DateCreated":
-                    sortedContext = sortedContext.OrderByDescending(p => p.DateCreated);
+                    sortedContext = sortedContext.OrderBy(p => p.DateCreated);
                     break;
                 case "dateCreated_desc":
                     sortedContext = sortedContext.OrderByDescending(p => p.DateCreated);
@@ -225,7 +227,6 @@ namespace MyFund.Controllers
 
             #region project derived and default values
             project.UserId = User.GetUserId().Value;
-            project.DateCreated = DateTime.Now;
             project.AmountGathered = 0;
             project.StatusId = (long)Status.StatusDescription.Inactive;
             #endregion
@@ -242,7 +243,7 @@ namespace MyFund.Controllers
         }
 
         // GET: Projects/Edit/5
-        //[Authorize(Policy = "ProjectCreator")]
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null)
@@ -283,9 +284,16 @@ namespace MyFund.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string statusUpdate, long id, [Bind("Id,Name,Title,ShortDescription,Description,Goal,AmountGathered,DateCreated,DateUpdated,Deadline,StatusId,ProjectCategoryId,Url,UserId,AttatchmentSetId,MediaUrl")] Project project)
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
+        public async Task<IActionResult> Edit(string statusUpdate, long id, Project project)
         {
             if (id != project.Id)
+            {
+                return NotFound();
+            }
+            var existingProject = await _context.Project.FindAsync(id);
+
+            if (existingProject == null)
             {
                 return NotFound();
             }
@@ -303,10 +311,18 @@ namespace MyFund.Controllers
                     {
                         if (statusUpdate == "Publish")
                         {
-                            project.StatusId = (long)Status.StatusDescription.Active;
+                            existingProject.StatusId = (long)Status.StatusDescription.Active;
                         }
-                        project.DateUpdated = DateTime.Now;
-                        _context.Update(project);
+                        existingProject.Deadline = project.Deadline;
+                        existingProject.Description = project.Description;
+                        existingProject.Goal = project.Goal;
+                        existingProject.MediaUrl = project.MediaUrl;
+                        existingProject.Name = project.Name;
+                        existingProject.ProjectCategoryId = project.ProjectCategoryId;
+                        existingProject.ShortDescription = project.ShortDescription;
+                        existingProject.Title = project.Title;
+                        existingProject.Url = project.Url;
+                        _context.Update(existingProject);
                         await _context.SaveChangesAsync();
                     }
                     catch (DbUpdateConcurrencyException)
@@ -341,6 +357,7 @@ namespace MyFund.Controllers
         }
 
         // GET: Projects/Delete/5
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null)
@@ -365,6 +382,7 @@ namespace MyFund.Controllers
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [AuthorizeResource(typeof(ResourceOwnerRequirement), typeof(Project))]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
             var project = await _context.Project.FindAsync(id);
